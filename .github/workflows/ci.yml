@@ -49,6 +49,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
+          fetch-tags: true
 
       - name: Setup .NET 8.0
         uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5
@@ -341,6 +342,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
+          fetch-tags: true
 
       - name: Get Tag Version
         id: tagversion
@@ -357,8 +359,7 @@ jobs:
         id: nbgv
         shell: pwsh
         run: |
-          $nbgvOutput = & nbgv get-version
-          $nugetVersion = ($nbgvOutput | Where-Object { $_ -match '^NuGetPackageVersion:' }) -replace '^NuGetPackageVersion:\s+', ''
+          $nugetVersion = & nbgv get-version -v NuGetPackageVersion
           Add-Content $env:GITHUB_OUTPUT "version=$nugetVersion"
 
       - name: Download NuGet Packages

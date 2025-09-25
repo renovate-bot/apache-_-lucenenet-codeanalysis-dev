@@ -270,6 +270,14 @@ Since Nerdbank.GitVersioning calculates the release version, the `AnalyzerReleas
 4. **Commit the changes**  
    Commit the modifications before tagging the release.
 
+   ```console
+   git add -A
+   git commit -m "Updated AnalyzerReleases with the latest changes"
+   ```
+
+   > [!NOTE]
+   > To ensure the Git commit hook works correctly, run these commands on the command line. Some GUI tools may interfere with it.
+
 ### Example: First and Second Releases with Version Token
 
 `AnalyzerReleases.Shipped.md` evolves by appending each release as a new section. Each release is marked with a `## Release <version>` header.
@@ -327,19 +335,25 @@ Run the following command to tag the HEAD commit of the release branch.
 nbgv tag
 ```
 
+This command will reply with the tag name and release commit hash.
+
+```console
+v1.0.0-alpha.155 tag created at bd65d5e12b6ed44ba478b8f564dd3f19799dfbf4.
+```
+
 > [!NOTE]
-> The release build workflow always builds from the HEAD commit of the release branch.
+> The release build workflow always builds from the tag, not the HEAD commit. To ensure all commits on the branch make it into the release, ensure that the tag is pointing to the HEAD commit.
 
 #### Push the Release Branch to the Upstream Repository
 
 The final step to begin the release build is to push the tag and any new commits to the upstream repository.
 
 ```console
-git push <remote-name> <release-branch> --follow-tags
+git push <remote-name> <release-branch> <tag-name>
 ```
 
-> [!NOTE]
-> If there are any local commits that have not yet been pushed, the above command will include them in the release.
+> [!IMPORTANT]
+> If there are any local commits that have not yet been pushed, the above command will include them in the release. The command provided as a hint from `nbgv tag` does not include the branch name, but we should always push the branch as well as the tags to put the upstream repository in a consistent state.
 
 The push will start the automated draft release which will take a few minutes. When completed, there will be a new draft release in the [GitHub Releases](https://github.com/apache/lucenenet-codeanalysis-dev/releases) corresponding to the version you tagged.
 
@@ -398,7 +412,7 @@ At the bottom of the draft release page, click on **Publish release**.
 
 ### Failed Draft Release
 
-If the build failed in any way, the release can be restarted by deleting the tag and trying again. First check to see the reason why the build failed in the [GitHub Actions UI](https://github.com/apache/lucenenet-codeanalysis-dev/actions) and correct any problems that were reported.
+If the build failed in any way, the release can be restarted by deleting the tag and trying again. First check to see the reason why the build failed in the [GitHub Actions UI](https://github.com/apache/lucenenet-codeanalysis-dev/actions) and correct any problems that were reported. Make any necessary commits to the release branch before starting the release.
 
 #### Restarting the Draft Release
 
@@ -454,4 +468,4 @@ git push --delete <remote-name> <release-branch>
 
 ### Update Lucene.NET
 
-The Lucene.NET project is the only consumer of this package. If the release was intended for general use (not just a one-off scan), update the version in `Dependencies.props` to reflect the new release and submit a pull request to [the Lucene.NET repository](https://github.com/apache/lucenenet).
+The Lucene.NET project is the only consumer of this package. If the release was intended for general use (not just a one-off scan), update the version in `.build/dependencies.props` to reflect the new release and submit a pull request to [the Lucene.NET repository](https://github.com/apache/lucenenet).

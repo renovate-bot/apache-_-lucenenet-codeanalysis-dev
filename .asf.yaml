@@ -2,7 +2,7 @@
 # See the documentation at: https://github.com/apache/infrastructure-asfyaml/blob/main/README.md
 
 github:
-  description: "Apache Lucene.NET Website"
+  description: "Roslyn Code Analysis for Apache Lucene.NET"
   homepage: https://lucenenet.apache.org/
   labels:
     - lucenenet

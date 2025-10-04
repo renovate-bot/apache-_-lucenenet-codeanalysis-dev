@@ -17,20 +17,30 @@
  * under the License.
  */
 
-namespace Lucene.Net.CodeAnalysis.Dev.Utility
+namespace Lucene.Net.Support;
+
+public class PublicClass
 {
-    public enum Category
-    {
-        Design,
-        Globalization,
-        Mobility,
-        Performance,
-        Security,
-        Usage,
-        Naming,
-        Interoperability,
-        Maintainability,
-        Reliability,
-        Documentation,
-    }
+}
+
+public interface PublicInterface
+{
+}
+
+public enum PublicEnum
+{
+}
+
+public delegate void PublicDelegate();
+
+public struct PublicStruct
+{
+}
+
+public record PublicRecord
+{
+}
+
+public record struct PublicRecordStruct
+{
 }

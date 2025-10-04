@@ -17,20 +17,31 @@
  * under the License.
  */
 
-namespace Lucene.Net.CodeAnalysis.Dev.Utility
+namespace Lucene.Net.Support.BlockScoped
 {
-    public enum Category
+    public class PublicClass
     {
-        Design,
-        Globalization,
-        Mobility,
-        Performance,
-        Security,
-        Usage,
-        Naming,
-        Interoperability,
-        Maintainability,
-        Reliability,
-        Documentation,
+    }
+
+    public interface PublicInterface
+    {
+    }
+
+    public enum PublicEnum
+    {
+    }
+
+    public delegate void PublicDelegate();
+
+    public struct PublicStruct
+    {
+    }
+
+    public record PublicRecord
+    {
+    }
+
+    public record struct PublicRecordStruct
+    {
     }
 }

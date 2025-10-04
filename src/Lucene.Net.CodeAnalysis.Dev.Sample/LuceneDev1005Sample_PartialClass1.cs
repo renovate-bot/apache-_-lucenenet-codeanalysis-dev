@@ -17,20 +17,12 @@
  * under the License.
  */
 
-namespace Lucene.Net.CodeAnalysis.Dev.Utility
+namespace Lucene.Net.Support.BlockScoped
 {
-    public enum Category
+    public partial class PublicPartialClass
     {
-        Design,
-        Globalization,
-        Mobility,
-        Performance,
-        Security,
-        Usage,
-        Naming,
-        Interoperability,
-        Maintainability,
-        Reliability,
-        Documentation,
+        public void Method1()
+        {
+        }
     }
 }

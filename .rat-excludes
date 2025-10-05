@@ -24,3 +24,5 @@ release-workflow\.svg
 # Exclude analyzer releases markdown files
 AnalyzerReleases\..*\.md
 
+# Exclude ASF infrastructure files
+.asf.yaml

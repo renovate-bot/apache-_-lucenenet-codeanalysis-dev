@@ -16,6 +16,7 @@ github:
     - query
     - apache
     - hacktoberfest
+    - code-analysis
     
   features:
     # Enable wiki for documentation

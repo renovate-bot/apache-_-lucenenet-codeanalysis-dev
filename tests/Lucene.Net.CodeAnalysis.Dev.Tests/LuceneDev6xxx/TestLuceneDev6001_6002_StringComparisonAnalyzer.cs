@@ -79,6 +79,81 @@ public class Sample
         }
 
         [Test]
+        public async Task Skips_IndexOf_CharLiteral()
+        {
+            var testCode = @"
+using System;
+
+public class Sample
+{
+    public void M()
+    {
+        string text = ""Hello"";
+        int index = text.IndexOf('H');
+    }
+}";
+
+            var test = new InjectableCSharpAnalyzerTest(() => new LuceneDev6001_6002_StringComparisonAnalyzer())
+            {
+                TestCode = testCode,
+                ExpectedDiagnostics = { } // IndexOf(char) has no StringComparison overload; no diagnostic
+            };
+
+            await test.RunAsync();
+        }
+
+        [Test]
+        public async Task Skips_IndexOf_CharVariable()
+        {
+            var testCode = @"
+using System;
+
+public class Sample
+{
+    public void M()
+    {
+        string text = ""Hello"";
+        char c = 'H';
+        int index = text.IndexOf(c);
+    }
+}";
+
+            var test = new InjectableCSharpAnalyzerTest(() => new LuceneDev6001_6002_StringComparisonAnalyzer())
+            {
+                TestCode = testCode,
+                ExpectedDiagnostics = { } // IndexOf(char) has no StringComparison overload; no diagnostic
+            };
+
+            await test.RunAsync();
+        }
+
+        [Test]
+        public async Task Skips_StartsWith_CharVariable()
+        {
+            var testCode = @"
+using System;
+
+public class Sample
+{
+    public void M()
+    {
+        string text = ""Hello"";
+        char c = 'H';
+        bool starts = text.StartsWith(c);
+    }
+}";
+
+            var test = new InjectableCSharpAnalyzerTest(() => new LuceneDev6001_6002_StringComparisonAnalyzer())
+            {
+                TestCode = testCode,
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net80, // string.StartsWith(char) requires .NET Core 2.0+
+                ExpectedDiagnostics = { } // StartsWith(char) has no StringComparison overload; no diagnostic
+            };
+
+            await test.RunAsync();
+        }
+
+        [Test]
         public async Task Detects_IndexOf_MissingStringComparison()
         {
             var testCode = @"
@@ -503,6 +578,83 @@ public class Sample
             {
                 TestCode = testCode,
                 ExpectedDiagnostics = { } // No diagnostics expected - not on System.String
+            };
+
+            await test.RunAsync();
+        }
+
+        [Test]
+        public async Task Detects_J2NStringBuilderExtensions_ReducedForm_MissingStringComparison()
+        {
+            var testCode = @"
+using System.Text;
+using J2N.Text;
+
+namespace J2N.Text
+{
+    public static class StringBuilderExtensions
+    {
+        public static int IndexOf(this StringBuilder sb, string value) => 0;
+    }
+}
+
+public class Sample
+{
+    public void M()
+    {
+        var sb = new StringBuilder(""hello"");
+        int index = sb.IndexOf(""he"");
+    }
+}";
+
+            var expected = new DiagnosticResult(Descriptors.LuceneDev6001_MissingStringComparison.Id, DiagnosticSeverity.Error)
+                .WithSeverity(DiagnosticSeverity.Error)
+                .WithMessageFormat(Descriptors.LuceneDev6001_MissingStringComparison.MessageFormat)
+                .WithArguments("IndexOf")
+                .WithLocation("/0/Test0.cs", line: 18, column: 24);
+
+            var test = new InjectableCSharpAnalyzerTest(() => new LuceneDev6001_6002_StringComparisonAnalyzer())
+            {
+                TestCode = testCode,
+                ExpectedDiagnostics = { expected }
+            };
+
+            await test.RunAsync();
+        }
+
+        [Test]
+        public async Task Detects_J2NStringBuilderExtensions_StaticForm_MissingStringComparison()
+        {
+            var testCode = @"
+using System.Text;
+
+namespace J2N.Text
+{
+    public static class StringBuilderExtensions
+    {
+        public static int IndexOf(this StringBuilder sb, string value) => 0;
+    }
+}
+
+public class Sample
+{
+    public void M()
+    {
+        var sb = new StringBuilder(""hello"");
+        int index = J2N.Text.StringBuilderExtensions.IndexOf(sb, ""he"");
+    }
+}";
+
+            var expected = new DiagnosticResult(Descriptors.LuceneDev6001_MissingStringComparison.Id, DiagnosticSeverity.Error)
+                .WithSeverity(DiagnosticSeverity.Error)
+                .WithMessageFormat(Descriptors.LuceneDev6001_MissingStringComparison.MessageFormat)
+                .WithArguments("IndexOf")
+                .WithLocation("/0/Test0.cs", line: 17, column: 54);
+
+            var test = new InjectableCSharpAnalyzerTest(() => new LuceneDev6001_6002_StringComparisonAnalyzer())
+            {
+                TestCode = testCode,
+                ExpectedDiagnostics = { expected }
             };
 
             await test.RunAsync();

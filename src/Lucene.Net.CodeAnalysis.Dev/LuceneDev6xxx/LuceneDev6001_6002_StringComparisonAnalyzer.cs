@@ -118,11 +118,26 @@ namespace Lucene.Net.CodeAnalysis.Dev.LuceneDev6xxx
             var (hasStringComparisonArg, isValidValue, invalidArgLocation, comparisonValueName) =
                 CheckStringComparisonArgument(invocation, semantic, stringComparisonType);
 
+            // The rule only applies to overloads whose value parameter is a string —
+            // overloads like IndexOf(char) / StartsWith(char) have no StringComparison sibling.
+            // For non-reduced extension method calls (e.g. StringBuilderExtensions.IndexOf(sb, "x")),
+            // Parameters[0] is the receiver, so skip past it.
+            static bool ValueParameterIsString(IMethodSymbol? m)
+            {
+                if (m == null || m.Parameters.Length == 0) return false;
+                int valueIndex = m.IsExtensionMethod && m.ReducedFrom == null ? 1 : 0;
+                return m.Parameters.Length > valueIndex
+                    && m.Parameters[valueIndex].Type.SpecialType == SpecialType.System_String;
+            }
+
             // If resolved symbol available
             if (methodSymbol != null)
             {
                 // Only apply rule to System.String or J2N.StringBuilderExtensions containing type
                 if (!ContainingTypeIsStringOrJ2N(methodSymbol.ContainingType))
+                    return;
+
+                if (!ValueParameterIsString(methodSymbol))
                     return;
 
                 // If the method has StringComparison parameter in signature
@@ -160,9 +175,9 @@ namespace Lucene.Net.CodeAnalysis.Dev.LuceneDev6xxx
             // Handle ambiguous candidates
             if (candidateSymbols.Length > 0)
             {
-                // Check if any candidate is from String or J2N types
+                // Check if any candidate is from String or J2N types and takes a string value parameter
                 var relevantCandidates = candidateSymbols
-                    .Where(c => ContainingTypeIsStringOrJ2N(c.ContainingType))
+                    .Where(c => ContainingTypeIsStringOrJ2N(c.ContainingType) && ValueParameterIsString(c))
                     .ToImmutableArray();
 
                 if (relevantCandidates.Length == 0)

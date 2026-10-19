@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Test Powershell Scripts
+name: Test PowerShell Scripts
 
 on:
   workflow_dispatch:
@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
-      - name: Restore Powershell Dependencies
+      - name: Restore PowerShell Dependencies
         shell: pwsh
         run: ./eng/Ensure-Powershell-Dependencies.ps1
 
